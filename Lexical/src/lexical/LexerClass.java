@@ -13,207 +13,178 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+import jdk.nashorn.internal.runtime.regexp.joni.Matcher;
 
 /**
  * Created by Mohammed Salah on 29/12/2016.
  */
 public class LexerClass {
 
-    BufferedReader reader;
-    char current;
-    List<Token> tokenList = new ArrayList<>();
-    public static final String KEY_WORDS[] = new String[]{
-        "await", "break", "case", "catch", "class", "const",
-        "continue", "debugger", "default", "delete", "do",
-        "else", "enum", "export", "extends", "false",
-        "finally", "for", "function", "if", "implements", "import", "in",
-        "instanceof", "interface", "let", "new", "null", "package",
-        "private", "protected", "public", "return", "super", "switch",
-        "static", "this", "throw", "try", "True", "typeof", "var",
-        "void", "while", "with", "yield"};
+    /**
+     * Mapping from type of token to its regular expression
+     */
+    private Map<TokenType, String> regEx;
 
-    public LexerClass(File file) {
+    /**
+     * List of tokens as they appear in the input source
+     */
+    private List<Token> result;
 
-        try {
-            reader = new BufferedReader(new FileReader(file));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        current = readNextChar();
+    /**
+     * Initializes a newly created {@code Lexer} object
+     */
+    public LexerClass() {
+        regEx = new TreeMap<TokenType, String>();
 
+        launchRegEx();
+
+        result = new ArrayList<Token>();
     }
 
-    List<Token> generateTokens() {
-        Token token = readNextToken();
-        while (token != null) {
-            tokenList.add(token);
-            token = readNextToken();
-        }
-        return tokenList;
-    }
-
-    Token readNextToken() {
-        int state = 1;
-
-        while (true) {
-            if (current == (char) (-1)) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
+    /**
+     * Performs the tokenization of the input source code.
+     *
+     * @param source string to be analyzed
+     * @throws AnalyzerException if lexical error exists in the source
+     *
+     */
+    public void tokenize(String source) throws AnalyzerException {
+        int position = 0;
+        Token token = null;
+        do {
+            token = separateToken(source, position);
+            if (token != null) {
+                position = token.getEnd();
+                result.add(token);
+            } else {
+                token = new Token(position, position, "error", TokenType.OpenBrace);
+                position++;
             }
+        } while (/*token != null &&*/ position != source.length());
+        if (position != source.length()) {
+            //Token teste = result.get(result.size()-1);
+            //System.out.println(teste.getTokenString());
+            throw new AnalyzerException("Lexical error at position # " + position, position);
 
-            switch (state) {
-                case 1: {
-                    if (current == ' ' || current == '\n' || current == '\t'
-                            || current == '\f' || current == '\b' || current == '\r') {
-                        current = readNextChar();
-                        continue;
-                    } else if (current == ';') {
-                        current = readNextChar();
-                        return new Token("Semicolon", ";");
-                    } else if (current == '+') {
-                        current = readNextChar();
-                        return new Token("Plus Operator", "+");
-                    } else if (current == '-') {
-                        current = readNextChar();
-                        return new Token("Minus Operator", "-");
-                    } else if (current == '*') {
-                        current = readNextChar();
-                        return new Token("Multiplication Operator", "*");
-                    } else if (current == '/') {
-                        current = readNextChar();
-                        return new Token("Division Operator", "/");
-                    } else if (current == '%') {
-                        current = readNextChar();
-                        return new Token("Remainder Operator", "%");
-                    } else if (current == '{') {
-                        current = readNextChar();
-                        return new Token("Left Bracket", "{");
-                    } else if (current == '}') {
-                        current = readNextChar();
-                        return new Token("right Bracket", "}");
-                    } else if (current == '(') {
-                        current = readNextChar();
-                        return new Token("Left Parenth", "(");
-                    } else if (current == ')') {
-                        current = readNextChar();
-                        return new Token("right Parenth", ")");
-                    } else if (current == ',') {
-                        current = readNextChar();
-                        return new Token("Comma", ",");
-                    } else if (current == '=') {
-                        current = readNextChar();
-                        if (current == '=') {
-                            current = readNextChar();
-                            return new Token("Equal Operator", "==");
-                        } else {
-                            return new Token("Assign Operator", "=");
-                        }
-                    } else if (current == '!') {
-                        current = readNextChar();
-                        if (current == '=') {
-                            current = readNextChar();
-                            return new Token("Not Equal Operator ", "!=");
-                        } else {
-                            return new Token("Not Defined", "!");
-                        }
-                    } else if (current == '&') {
-                        current = readNextChar();
-                        if (current == '&') {
-                            current = readNextChar();
-                            return new Token("Conditional And", "&&");
-                        } else {
-                            return new Token("Not Defined", "&");
-                        }
-                    } else if (current == '|') {
-                        current = readNextChar();
-                        if (current == '|') {
-                            current = readNextChar();
-                            return new Token("Conditional Or", "||");
-                        } else {
-                            return new Token("Not Defined", "|");
-                        }
-                    } else {
-                        state = 2;
-                        continue;
-                    }
+        }
+    }
 
-                }
-                case 2: {
-                    if (isNumber(current)) {
-                        String num = String.valueOf(current);
-                        for (;;) {
-                            current = readNextChar();
-                            if (isNumber(current) || current == '.') {
-                                num += String.valueOf(current);
-                            } else {
-                                if (num.contains(".")) {
-                                    return new Token("Decimal", num);
-                                } else {
-                                    return new Token("Integer", num);
-                                }
-                            }
-                        }
-                    } else {
-                        state = 3;
-                    }
-                }
-                case 3: {
-                    if (isLetter(current) || current == '_') {
-                        String word = String.valueOf(current);
-                        for (;;) {
-                            current = readNextChar();
-                            if (isLetter(current) || current == '_' || isNumber(current)) {
-                                word += String.valueOf(current);
-                            } else {
-                                List key_words = Arrays.asList(KEY_WORDS);
+    /**
+     * Returns a sequence of tokens
+     *
+     * @return list of tokens
+     */
+    public List<Token> getTokens() {
+        return result;
+    }
 
-                                if (key_words.contains(word)) {
-                                    return new Token("Keyword", word);
-                                } else {
-                                    return new Token("Variable", word);
-                                }
-                            }
-                        }
-                    } else {
-                        current = readNextChar();
-                        return new Token("Error", "Not Defined " + current);
-                    }
-                }
+    /**
+     * Returns a sequence of tokens without types {@code BlockComment},
+     * {@code LineComment} , {@code NewLine}, {@code Tab}, {@code WhiteSpace}
+     *
+     * @return list of tokens
+     */
+    public List<Token> getFilteredTokens() {
+        List<Token> filteredResult = new ArrayList<Token>();
+        for (Token t : this.result) {
+            if (!t.getTokenType().isAuxiliary()) {
+                filteredResult.add(t);
+            }
+        }
+        return filteredResult;
+    }
+
+    /**
+     * Scans the source from the specific index and returns the first separated
+     * token
+     *
+     * @param source source code to be scanned
+     * @param fromIndex the index from which to start the scanning
+     * @return first separated token or {@code null} if no token was found
+     *
+     */
+    private Token separateToken(String source, int fromIndex) {
+        if (fromIndex < 0 || fromIndex >= source.length()) {
+            throw new IllegalArgumentException("Illegal index in the input stream!");
+        }
+        for (TokenType tokenType : TokenType.values()) {
+            Pattern p = Pattern.compile(".{" + fromIndex + "}" + regEx.get(tokenType),
+                    Pattern.DOTALL);
+            java.util.regex.Matcher m = p.matcher(source);
+            if (m.matches()) {
+                String lexema = m.group(1);
+                return new Token(fromIndex, fromIndex + lexema.length(), lexema, tokenType);
             }
         }
 
+        return null;
     }
 
-    char readNextChar() {
-        try {
-            return (char) reader.read();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return (char) (-1);
-    }
-
-    boolean isNumber(char c) {
-        if (c >= '0' && c <= '9') {
-            return true;
-        }
-
-        return false;
-    }
-
-    boolean isLetter(char c) {
-        if (c >= 'a' && c <= 'z') {
-            return true;
-        }
-        if (c >= 'A' && c <= 'Z') {
-            return true;
-        }
-
-        return false;
-
+    /**
+     * Creates map from token types to its regular expressions
+     *
+     */
+    private void launchRegEx() {
+        regEx.put(TokenType.BlockComment, "(/\\*.*?\\*/).*");
+        regEx.put(TokenType.LineComment, "(//(.*?)[\r$]?\n).*");
+        regEx.put(TokenType.WhiteSpace, "( ).*");
+        regEx.put(TokenType.String, "(\".*?\"|'.*?').*");
+        regEx.put(TokenType.RegExp, "/[a-zA-Z\\[0-9]_?:()*.|]+/.*");
+        regEx.put(TokenType.OpenBrace, "(\\().*");
+        regEx.put(TokenType.CloseBrace, "(\\)).*");
+        regEx.put(TokenType.Semicolon, "(;).*");
+        regEx.put(TokenType.Comma, "(,).*");
+        regEx.put(TokenType.OpeningCurlyBrace, "(\\{).*");
+        regEx.put(TokenType.ClosingCurlyBrace, "(\\}).*");
+        regEx.put(TokenType.DoubleConstant, "\\b(\\d{1,9}\\.\\d{1,32})\\b.*");
+        regEx.put(TokenType.IntConstant, "\\b(\\d{1,9})\\b.*");
+        regEx.put(TokenType.Void, "\\b(void)\\b.*");
+        regEx.put(TokenType.Int, "\\b(int)\\b.*");
+        regEx.put(TokenType.Double, "\\b(int|double)\\b.*");
+        regEx.put(TokenType.Tab, "(\\t).*");
+        regEx.put(TokenType.NewLine, "(\\n).*");
+        regEx.put(TokenType.Carriage, "(\\r).*");
+        regEx.put(TokenType.Public, "\\b(public)\\b.*");
+        regEx.put(TokenType.Private, "\\b(private)\\b.*");
+        regEx.put(TokenType.False, "\\b(false)\\b.*");
+        regEx.put(TokenType.True, "\\b(true)\\b.*");
+        regEx.put(TokenType.Null, "\\b(null)\\b.*");
+        regEx.put(TokenType.Return, "\\b(return)\\b.*");
+        regEx.put(TokenType.New, "\\b(new)\\b.*");
+        regEx.put(TokenType.Class, "\\b(class)\\b.*");
+        regEx.put(TokenType.If, "\\b(if)\\b.*");
+        regEx.put(TokenType.Else, "\\b(else)\\b.*");
+        regEx.put(TokenType.While, "\\b(while)\\b.*");
+        regEx.put(TokenType.Static, "\\b(static)\\b.*");
+        regEx.put(TokenType.Function, "\\b(function)\\b.*");
+        regEx.put(TokenType.Var, "\\b(var)\\b.*");
+        regEx.put(TokenType.Undefined, "\\b(undefined)\\b.*");
+        regEx.put(TokenType.Break, "\\b(break)\\b.*");
+        regEx.put(TokenType.Point, "(\\.).*");
+        regEx.put(TokenType.Plus, "(\\+{1}).*");
+        regEx.put(TokenType.Minus, "(\\-{1}).*");
+        regEx.put(TokenType.Multiply, "(\\*).*");
+        regEx.put(TokenType.Divide, "(/).*");
+        regEx.put(TokenType.EqualEqualEqual, "(===).*");
+        regEx.put(TokenType.EqualEqual, "(==).*");
+        regEx.put(TokenType.Equal, "(=).*");
+        regEx.put(TokenType.ExclameEqual, "(\\!=).*");
+        regEx.put(TokenType.Greater, "(>).*");
+        regEx.put(TokenType.Less, "(<).*");
+        regEx.put(TokenType.Module, "(%).*");
+        regEx.put(TokenType.And, "(&&).*");
+        regEx.put(TokenType.SingleAnd, "(&&).*");
+        regEx.put(TokenType.Or, "(\\|\\|).*");
+        regEx.put(TokenType.SingleOr, "(\\|).*");
+        regEx.put(TokenType.IfTernary, "(\\?).*");
+        //regEx.put(TokenType.Property, "\\b([a-zA-Z]{1}[0-9a-zA-Z_]{0,31}\\: )\\b.*");
+        regEx.put(TokenType.ElseTernary, "(\\:).*");
+        regEx.put(TokenType.FalseAbrev, "(\\!).*");
+        regEx.put(TokenType.InitArray, "(\\[).*");
+        regEx.put(TokenType.FinalArray, "(\\]).*");
+        regEx.put(TokenType.Identifier, "\\b([a-zA-Z_]{1}[0-9a-zA-Z_]{0,31})\\b.*");
     }
 }

@@ -14,24 +14,84 @@ package lexical;
  */
 public class Token {
 
-    String token;
-    String lexeme;
+    /**
+     * The beginning index of this token in the input
+     */
+    private int beginIndex;
 
-    public Token(String token, String lexeme) {
-        this.token = token;
-        this.lexeme = lexeme;
+    /**
+     * The ending index of token in the input
+     */
+    private int endIndex;
+
+    /**
+     * Type(category) of token
+     */
+    private TokenType tokenType;
+
+    /**
+     * String of characters for this token
+     */
+    private String tokenString;
+
+    /**
+     * Constructs new {@code Token} object with specified parameters.
+     *
+     * @param beginIndex the beginning index of this token in the input,
+     * inclusive
+     * @param endIndex the ending index of token in the input, exclusive
+     * @param tokenString string of characters
+     * @param tokenType type of token
+     */
+    public Token(int beginIndex, int endIndex, String tokenString, TokenType tokenType) {
+        this.beginIndex = beginIndex;
+        this.endIndex = endIndex;
+        this.tokenType = tokenType;
+        this.tokenString = tokenString;
     }
 
+    /**
+     * Returns the beginning index
+     *
+     * @return the beginning index of this token in the input, inclusive
+     */
+    public int getBegin() {
+        return beginIndex;
+    }
+
+    /**
+     * Returns the ending index
+     *
+     * @return the ending index of token in the input, exclusive
+     */
+    public int getEnd() {
+        return endIndex;
+    }
+
+    /**
+     * Returns a string for the token
+     *
+     * @return a string of characters associated with this token
+     */
+    public String getTokenString() {
+        return tokenString;
+    }
+
+    /**
+     * Returns token's type
+     *
+     * @return type associated with this token
+     */
+    public TokenType getTokenType() {
+        return tokenType;
+    }
+
+    @Override
     public String toString() {
-        String format = "[" + lexeme;
-        int initLength = format.length();
-
-        for (int i = 0; i <= 50 - initLength; i++) {
-            format += " ";
+        if (!this.getTokenType().isAuxiliary()) {
+            return tokenType + "  '" + tokenString + "' [" + beginIndex + ";" + endIndex + "] ";
+        } else {
+            return tokenType + "   [" + beginIndex + ";" + endIndex + "] ";
         }
-
-        format += token + "]";
-
-        return format;
     }
 }

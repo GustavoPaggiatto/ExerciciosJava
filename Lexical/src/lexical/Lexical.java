@@ -5,8 +5,10 @@
  */
 package lexical;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,10 +30,13 @@ public class Lexical {
         System.out.println("Executando...");
 
         try {
-            File file = new File("C:\\Users\\Gustavo\\Desktop\\EC5\\Lexical\\ExerciciosJava\\Lexical\\jquery.txt");
-            LexerClass lexerClass = new LexerClass(file);
-            List<Token> tokens = lexerClass.generateTokens();
+            String stream = readFile("C:\\Users\\Gustavo\\Desktop\\EC5\\Lexical\\ExerciciosJava\\Lexical\\jquery.txt");
 
+            LexerClass lexer = new LexerClass();
+            lexer.tokenize(stream);
+            
+            List<Token> tokens = lexer.getTokens();
+            
             writeFile(tokens);
 
             /* for tests...
@@ -42,6 +47,22 @@ public class Lexical {
         } catch (Exception ex) {
             System.out.println("Exception: " + ex.getMessage());
         }
+    }
+
+    private static String readFile(String filePath) throws IOException {
+        StringBuffer fileData = new StringBuffer();
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        char[] buf = new char[1024];
+        int numRead = 0;
+
+        while ((numRead = reader.read(buf)) != -1) {
+            String readData = String.valueOf(buf, 0, numRead);
+            fileData.append(readData);
+            buf = new char[1024];
+        }
+
+        reader.close();
+        return fileData.toString();
     }
 
     private static void writeFile(List<Token> tokens) throws IOException {
