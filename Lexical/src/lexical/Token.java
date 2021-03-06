@@ -9,33 +9,29 @@ package lexical;
  *
  * @author Gustavo
  */
+/**
+ * Created by Mohammed Salah on 29/12/2016.
+ */
 public class Token {
 
-    private int _column;
-    private String _code;
+    String token;
+    String lexeme;
 
-    public int getColumn() {
-        return _column;
+    public Token(String token, String lexeme) {
+        this.token = token;
+        this.lexeme = lexeme;
     }
 
-    public void setColumn(int _column) {
-        this._column = _column;
-    }
+    public String toString() {
+        String format = "[" + lexeme;
+        int initLength = format.length();
 
-    public String getCode() {
-        return _code;
-    }
+        for (int i = 0; i <= 50 - initLength; i++) {
+            format += " ";
+        }
 
-    public void setCode(String _code) {
-        this._code = _code;
-    }
+        format += token + "]";
 
-    public TokenType getType() {
-        return _type;
+        return format;
     }
-
-    public void setType(TokenType _type) {
-        this._type = _type;
-    }
-    private TokenType _type;
 }
