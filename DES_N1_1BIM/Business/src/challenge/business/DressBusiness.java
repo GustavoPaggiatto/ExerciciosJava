@@ -1,5 +1,9 @@
+package challenge.business;
 
+import challenge.repository.*;
+import challenge.Domain.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /*
@@ -13,6 +17,10 @@ import java.util.List;
  */
 public class DressBusiness extends BaseBusiness<Dress> {
 
+    public DressBusiness() {
+        super(Dress.class);
+    }
+
     public void insert(Dress model) throws Exception {
 
         model.setBrand(model.getBrand().trim());
@@ -25,13 +33,15 @@ public class DressBusiness extends BaseBusiness<Dress> {
             throw new Exception("Local de compra não informado!!!");
         }
 
-        RepositoryFactory repoFactory = new RepositoryFactory<DressRepository>();
+        RepositoryFactory<DressRepository> repoFactory = new RepositoryFactory<DressRepository>(DressRepository.class);
         DressRepository repository = (DressRepository) repoFactory.getInstante();
-        List<Dress> items = repository.getDresses();
+        List<Dress> items = repository.list();
 
-        for (Dress item : items) {
-            if (item.getCode() == model.getCode()) {
-                throw new Exception("Já existe um item com este código, informe outro!!!");
+        if (items != null && items.size() > 0) {
+            for (Dress item : items) {
+                if (item.getCode() == model.getCode()) {
+                    throw new Exception("Já existe um item com este código, informe outro!!!");
+                }
             }
         }
 
@@ -75,14 +85,16 @@ public class DressBusiness extends BaseBusiness<Dress> {
             throw new Exception("O código deve ser diferente de zero(0)!!!");
         }
 
-        RepositoryFactory repoFactory = new RepositoryFactory<DressRepository>();
+        RepositoryFactory<DressRepository> repoFactory = new RepositoryFactory<DressRepository>(DressRepository.class);
         DressRepository repository = (DressRepository) repoFactory.getInstante();
-        List<Dress> items = repository.getDresses();
+        List<Dress> items = repository.list();
         boolean found = false;
 
-        for (Dress item : items) {
-            if (item.getCode() == model.getCode()) {
-                found = true;
+        if (items != null && items.size() > 0) {
+            for (Dress item : items) {
+                if (item.getCode() == model.getCode()) {
+                    found = true;
+                }
             }
         }
 
@@ -116,10 +128,37 @@ public class DressBusiness extends BaseBusiness<Dress> {
     }
 
     public List<Dress> list() throws InstantiationException, IllegalAccessException, FileNotFoundException {
-        RepositoryFactory repoFactory = new RepositoryFactory<DressRepository>();
-        DressRepository repository = (DressRepository) repoFactory.getInstante();
-        List<Dress> items = repository.getDresses();
+        RepositoryFactory<DressRepository> factory = new RepositoryFactory<DressRepository>(DressRepository.class);
+        DressRepository repository = (DressRepository) factory.getInstante();
+        List<Dress> items = repository.list();
 
         return items;
+    }
+
+    public void delete(int code) throws InstantiationException, IllegalAccessException, IOException, Exception {
+        Dress model = this.getInstance();
+
+        model.setCode(code);
+
+        RepositoryFactory<DressRepository> repoFactory = new RepositoryFactory<DressRepository>(DressRepository.class);
+        DressRepository repository = (DressRepository) repoFactory.getInstante();
+        List<Dress> itens = repository.list();
+
+        if (itens != null && itens.size() > 0) {
+            boolean found = false;
+
+            for (Dress item : itens) {
+                if (item.getCode() == model.getCode()) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                throw new Exception("Código inesistente para exclusão.");
+            }
+
+            repository.delete(model);
+        }
     }
 }

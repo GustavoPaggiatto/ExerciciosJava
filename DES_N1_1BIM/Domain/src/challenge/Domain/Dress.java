@@ -1,3 +1,5 @@
+package challenge.Domain;
+
 
 import java.util.Date;
 

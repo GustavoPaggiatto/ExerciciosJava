@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package ui;
 
 /**
  *
  * @author Gustavo
  */
-public class BaseRepository<T> {
-
-    Class<T> _class;
-
-    public T getInstance() throws InstantiationException, IllegalAccessException {
-        return _class.newInstance();
-    }
+public enum TipoConsole {
+    INITIAL, LIST, ADD, REMOVE, UPD
 }

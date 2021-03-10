@@ -27,3 +27,13 @@ hs_err_pid*
 /DES_N1_1BIM/DAL/nbproject/private/
 /DES_N1_1BIM/Business/nbproject/private/
 /DES_N1_1BIM/Domain/nbproject/private/
+/DES_N1_1BIM/Business/build/
+/DES_N1_1BIM/DAL/build/
+/DES_N1_1BIM/Domain/build/
+/DES_N1_1BIM/Domain/dist/
+/DES_N1_1BIM/DAL/dist/
+/DES_N1_1BIM/Business/dist/
+/DES_N1_1BIM/UI/build/
+/DES_N1_1BIM/UI/dist/
+/DES_N1_1BIM/Repository/nbproject/private/
+/DES_N1_1BIM/Repository/build/

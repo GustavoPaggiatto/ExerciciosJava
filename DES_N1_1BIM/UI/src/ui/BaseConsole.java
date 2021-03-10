@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package ui;
 
 /**
  *
  * @author Gustavo
  */
-public abstract class BaseBusiness<T> {
+public abstract class BaseConsole {
 
-    private Class<T> _class;
+    protected int _option;
 
-    public T getInstance() throws InstantiationException, IllegalAccessException {
-        return _class.newInstance();
+    public abstract boolean execute();
+
+    public int getOption() {
+        return this._option;
     }
 }
