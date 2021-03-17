@@ -37,3 +37,8 @@ hs_err_pid*
 /DES_N1_1BIM/UI/dist/
 /DES_N1_1BIM/Repository/nbproject/private/
 /DES_N1_1BIM/Repository/build/
+/DES_N1_1BIM/LPII02.Dal/nbproject/private/
+/DES_N1_1BIM/LPII02.Domain/nbproject/private/
+/DES_N1_1BIM/LPII02.Business/nbproject/private/
+/balanced_brackets/bb/nbproject/private/
+/balanced_brackets/bb/build/
