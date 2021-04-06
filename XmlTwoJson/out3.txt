@@ -3,7 +3,14 @@
 	{
 		"CD":
 		[
-			{"TITLE":"Empire Burlesque","ARTIST":"Bob Dylan","COUNTRY":"USA","COMPANY":"Columbia","PRICE":"10.90","YEAR":"1985"},
+			{
+				"TITLE":"Empire Burlesque",
+				"ARTIST":"Bob Dylan",
+				"COUNTRY":"USA",
+				"COMPANY":"Columbia",
+				"PRICE":"10.90",
+				"YEAR":"1985"
+			},
 			{"TITLE":"Hide your heart","ARTIST":"Bonnie Tyler","COUNTRY":"UK","COMPANY":"CBS Records","PRICE":"9.90","YEAR":"1988"},
 			{"TITLE":"Greatest Hits","ARTIST":"Dolly Parton","COUNTRY":"USA","COMPANY":"RCA","PRICE":"9.90","YEAR":"1982"},
 			{"TITLE":"Still got the blues","ARTIST":"Gary Moore","COUNTRY":"UK","COMPANY":"Virgin records","PRICE":"10.20","YEAR":"1990"},
@@ -30,5 +37,5 @@
 			{"TITLE":"Red","ARTIST":"The Communards","COUNTRY":"UK","COMPANY":"London","PRICE":"7.80","YEAR":"1987"},
 			{"TITLE":"Unchain my heart","ARTIST":"Joe Cocker","COUNTRY":"USA","COMPANY":"EMI","PRICE":"8.20","YEAR":"1987"}
 		]
-	}
+	},
 }

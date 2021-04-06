@@ -25,6 +25,7 @@ public class JsonWriter {
         //private call...
         this.convert(root, json);
 
+        json = json.delete(json.length() - 1, json.length());
         json.append("}");
 
         return json.toString();
@@ -72,11 +73,11 @@ public class JsonWriter {
             //json.replace(json.length() - 1, json.length(), ""); 
 
             if (aux) {
-                json.append("}");
+                //json.append("}");
                 json.append("]");
             }
 
-            json.append("}");
+            json.append("},");
         }
     }
 }
