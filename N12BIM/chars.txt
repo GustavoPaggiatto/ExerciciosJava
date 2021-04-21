@@ -1,0 +1,7 @@
+E:d|ol|or|ob
+G:90
+W:D
+D:dddOLdddORdddOBdddddd
+OL:ol
+OR:or
+OB:ob
