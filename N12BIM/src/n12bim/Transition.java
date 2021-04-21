@@ -18,6 +18,7 @@ public class Transition {
     public Transition(String before, String after, boolean isInitial) {
         this.before = before;
         this.after = after;
+        this.isInitial = isInitial;
     }
 
     public String getBefore() {

@@ -7,6 +7,8 @@ package n12bim;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -66,13 +68,19 @@ public class N12BIM {
             return;
         }
 
-        Automaton automaton = null;
-
-        System.out.println();
-        System.out.println(TEXT_PURPLE + "Preparando autômato..." + TEXT_RESET);
-
         try {
-            automaton = buildAutomaton(lines);
+            System.out.println();
+            System.out.println(TEXT_PURPLE + "Preparando autômato..." + TEXT_RESET);
+
+            Automaton automaton = buildAutomaton(lines);
+
+            System.out.println();
+            System.out.println(TEXT_PURPLE + "Aplicando regras de derivação..." + TEXT_RESET);
+
+            String result = applyRules(automaton);
+
+            validateContent(result, automaton);
+            writeGraph(result);
         } catch (Exception ex) {
             System.out.println();
             System.out.println(TEXT_RED + ex.getMessage() + TEXT_RESET);
@@ -89,30 +97,6 @@ public class N12BIM {
             return;
         }
 
-        System.out.println();
-        System.out.println(TEXT_PURPLE + "Aplicando regras de derivação..." + TEXT_RESET);
-
-        String result = null;
-
-        try {
-            result = applyRules(automaton);
-        } catch (Exception ex) {
-            System.out.println();
-            System.out.println(TEXT_RED + ex.getMessage() + TEXT_RESET);
-
-            System.out.println();
-            System.out.println(TEXT_GREEN + "Terminando a execução do programa" + TEXT_RESET);
-
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                //Nothing...
-            }
-
-            return;
-        }
-
-        //write .SVG...
         System.out.println();
         System.out.println(TEXT_GREEN + "Terminando a execução do programa" + TEXT_RESET);
 
@@ -145,13 +129,17 @@ public class N12BIM {
                 }
 
                 automaton.setDegree(Double.parseDouble(degree));
+                continue;
             }
 
             if (line.indexOf(":") <= 0) {
                 throw new Exception("Regra de derivação inválida (sem \":\").");
             }
 
-            transitions.add(new Transition(line.substring(0, line.indexOf(":")), line.substring(line.indexOf(":")), line.substring(0) == "W"));
+            transitions.add(new Transition(
+                    line.substring(0, line.indexOf(":")),
+                    line.substring(line.indexOf(":") + 1),
+                    line.substring(0, 1).equals("W")));
         }
 
         boolean findFirst = false;
@@ -221,7 +209,7 @@ public class N12BIM {
             while (result.contains(t.getBefore())) {
                 int ix = result.indexOf(t.getBefore());
 
-                result = result.substring(0, ix - 1)
+                result = result.substring(0, ix)
                         + t.getAfter()
                         + result.substring(ix + t.getBefore().length());
 
@@ -229,5 +217,71 @@ public class N12BIM {
         }
 
         return result;
+    }
+
+    public static void validateContent(String result, Automaton automaton) throws Exception {
+        for (int i = 0; i < result.length(); i++) {
+            char c = result.charAt(i);
+            boolean found = false;
+
+            for (String item : automaton.getAlphabet()) {
+                if (String.valueOf(c).equals(item)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                throw new Exception("Charactere não pertence ao alfabeto após a conversão ("
+                        + String.valueOf(c)
+                        + ")");
+            }
+        }
+    }
+
+    public static void writeGraph(String result) throws IOException {
+        StringBuilder strBuilder = new StringBuilder();
+        int xZero = 300;
+        int yZero = 200;
+        int x = xZero;
+        int y = yZero;
+        int lineLength = 10;
+        int direction = 0; //always init in TOP direction...
+
+        strBuilder.append("<svg height=\"400\" width=\"600\">");
+
+        for (int i = 0; i < result.length(); i++) {
+            if (result.charAt(i) == 'd' && direction == 0) {
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + x + "\" y2=\"" + (y + lineLength) + "\" />");
+            } else if (result.charAt(i) == 'd' && direction == 1) { //left
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + (x - lineLength) + "\" y2=\"" + y + "\" />");
+            } else if (result.charAt(i) == 'd' && direction == 2) { //right
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + (x + lineLength) + "\" y2=\"" + y + "\"/>");
+            } else if (result.charAt(i) == 'd' && direction == 3) { //bottom
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + x + "\" y2=\"" + (y - lineLength) + "\" />");
+            } else {
+                x = xZero;
+                y = yZero;
+                String strDirection = result.substring(i, i + 1);
+
+                if (strDirection.equals("ol")) {
+                    direction = 1;
+                } else if (strDirection.equals("or")) {
+                    direction = 2;
+                } else {
+                    direction = 3;
+                }
+
+                i++; // important to ignore [lrb]...
+            }
+        }
+
+        strBuilder.append("</svg>");
+
+        FileWriter writer = new FileWriter("C:\\Users\\Gustavo\\Desktop\\EC5\\Java\\Exercicios\\ExerciciosJava\\N12BIM\\cross.svg");
+
+        writer.write(strBuilder.toString());
+        writer.flush();
+        writer.close();
     }
 }

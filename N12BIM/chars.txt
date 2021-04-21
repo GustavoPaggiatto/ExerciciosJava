@@ -1,4 +1,4 @@
-E:d|ol|or|ob
+E:d|o|l|r|b
 G:90
 W:D
 D:dddOLdddORdddOBdddddd
