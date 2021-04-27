@@ -245,24 +245,28 @@ public class N12BIM {
         int yZero = 200;
         int x = xZero;
         int y = yZero;
-        int lineLength = 10;
+        int lineLength = 20;
         int direction = 0; //always init in TOP direction...
 
         strBuilder.append("<svg height=\"400\" width=\"600\">");
 
         for (int i = 0; i < result.length(); i++) {
             if (result.charAt(i) == 'd' && direction == 0) {
-                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + x + "\" y2=\"" + (y + lineLength) + "\" />");
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + x + "\" y2=\"" + (y - lineLength) + "\" style=\"fill:rgb(0,0,255);stroke-width:2;stroke:rgb(0,0,0)\"/>");
+                y -= lineLength;
             } else if (result.charAt(i) == 'd' && direction == 1) { //left
-                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + (x - lineLength) + "\" y2=\"" + y + "\" />");
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + (x - lineLength) + "\" y2=\"" + y + "\" style=\"fill:rgb(0,0,255);stroke-width:2;stroke:rgb(0,0,0)\"/>");
+                x -= lineLength;
             } else if (result.charAt(i) == 'd' && direction == 2) { //right
-                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + (x + lineLength) + "\" y2=\"" + y + "\"/>");
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + (x + lineLength) + "\" y2=\"" + y + "\" style=\"fill:rgb(0,0,255);stroke-width:2;stroke:rgb(0,0,0)\"/>");
+                x += lineLength;
             } else if (result.charAt(i) == 'd' && direction == 3) { //bottom
-                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + x + "\" y2=\"" + (y - lineLength) + "\" />");
+                strBuilder.append("<line x1=\"" + x + "\" y1=\"" + y + "\" x2=\"" + x + "\" y2=\"" + (y + lineLength) + "\" style=\"fill:rgb(0,0,255);stroke-width:2;stroke:rgb(0,0,0)\"/>");
+                y += lineLength;
             } else {
                 x = xZero;
                 y = yZero;
-                String strDirection = result.substring(i, i + 1);
+                String strDirection = result.substring(i, i + 2);
 
                 if (strDirection.equals("ol")) {
                     direction = 1;
@@ -278,9 +282,12 @@ public class N12BIM {
 
         strBuilder.append("</svg>");
 
-        FileWriter writer = new FileWriter("C:\\Users\\Gustavo\\Desktop\\EC5\\Java\\Exercicios\\ExerciciosJava\\N12BIM\\cross.svg");
+        FileWriter writer = new FileWriter("C:\\Users\\Gustavo\\Desktop\\EC5\\Java\\Exercicios\\ExerciciosJava\\N12BIM\\cross.html");
 
+        writer.append("<!DOCTYPE html><html><head></head><body><div style=\"max-width: 80%; margin:auto;border: 1px solid #a6a6a6;box-shadow: 5px 10px 8px #888888;display:flex;justify-content:center;\">");
         writer.write(strBuilder.toString());
+        writer.write("</div></body></html>");
+        
         writer.flush();
         writer.close();
     }
