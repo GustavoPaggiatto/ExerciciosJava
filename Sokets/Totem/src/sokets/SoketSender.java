@@ -19,10 +19,10 @@ public class SoketSender {
         Socket socket = new Socket("192.168.0.100", 5000);
         DataOutputStream stream = new DataOutputStream(socket.getOutputStream());
         
-        stream.writeUTF("## Tag  ");
-        stream.writeUTF("**Código:** " + code + "  ");
-        stream.writeUTF("**Quantidade:** " + quantity + "  ");
-        stream.writeUTF("**Frágil:** " + (fragile ? "Sim" : "Não") + "  ");
+        stream.writeUTF("## Tag  " +
+                "**Código:** " + code + "  " +
+                "**Quantidade:** " + quantity + "  " +
+                "**Frágil:** " + (fragile ? "Sim" : "Não") + "  ");
         stream.flush();
     }
 }

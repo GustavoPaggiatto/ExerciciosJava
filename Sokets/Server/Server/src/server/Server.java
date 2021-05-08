@@ -13,13 +13,27 @@ public class Server {
 
     public static final String TEXT_PURPLE = "\u001B[35m";
     public static final String TEXT_RESET = "\u001B[0m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.print(TEXT_PURPLE + "*************** Server Socket ***************" + TEXT_RESET);
-        System.out.print(TEXT_PURPLE + "Initialising thread listener" + TEXT_RESET);
+        System.out.println(TEXT_PURPLE + "*************** Server Socket ***************" + TEXT_RESET);
+        System.out.println(TEXT_PURPLE + "Initialising thread listener" + TEXT_RESET);
+
+        SocketListener listener = new SocketListener();
+        listener.start();
+
+        while (!listener.getError()) {
+            /*System.out.println(ANSI_YELLOW + "Estado do listener: "
+                    + listener.getState().name()
+                    + "."
+                    + TEXT_RESET);*/
+        }
+
+        System.out.println(ANSI_BLUE + "Finalizando o listener..." + TEXT_RESET);
     }
 
 }

@@ -5,8 +5,11 @@
  */
 package server;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,22 +20,48 @@ import java.util.logging.Logger;
  */
 public class SocketListener extends Thread {
 
+    private boolean _error;
+
+    public boolean getError() {
+        return this._error;
+    }
+
     @Override
     public void run() {
-        Socket socket = null;
+        ServerSocket socket = null;
         DataInputStream inputStream = null;
 
         try {
-            socket = new Socket("192.168.0.100", 5000);
-            inputStream = new DataInputStream(socket.getInputStream());
+            socket = new ServerSocket(5000);
         } catch (IOException ex) {
             Logger.getLogger(SocketListener.class.getName()).log(Level.SEVERE, null, ex);
+            this._error = true;
+
+            return;
         }
 
-        while (true) {
+        while (!this._error) {
             try {
+                Socket connected = socket.accept();
+                inputStream = new DataInputStream(connected.getInputStream());
+
+                System.out.println("Tag recebida: ");
+                
+                String content = inputStream.readUTF();
+                
+                System.out.println(content);
+
                 this.sleep(5000);
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
+                Logger.getLogger(SocketListener.class.getName()).log(Level.SEVERE, null, ex);
+                this._error = true;
+            }
+        }
+
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (Exception ex) {
                 Logger.getLogger(SocketListener.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
