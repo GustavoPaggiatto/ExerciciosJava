@@ -23,16 +23,27 @@ public class Server {
         System.out.println(TEXT_PURPLE + "*************** Server Socket ***************" + TEXT_RESET);
         System.out.println(TEXT_PURPLE + "Initialising thread listener" + TEXT_RESET);
 
-        SocketListener listener = new SocketListener();
-        listener.start();
+        SocketListener printerOne = new SocketListener(5000);
+        printerOne.start();
 
-        while (!listener.getError()) {
-            /*System.out.println(ANSI_YELLOW + "Estado do listener: "
+        SocketListener printerTwo = new SocketListener(5001);
+        printerTwo.start();
+
+        SocketListener printerTree = new SocketListener(5002);
+        printerTree.start();
+
+        SocketListener printerFour = new SocketListener(5003);
+        printerFour.start();
+
+        SocketListener printerFive = new SocketListener(5004);
+        printerFive.start();
+
+        /*while (!printerOne.getError()) {
+            System.out.println(ANSI_YELLOW + "Estado do listener: "
                     + listener.getState().name()
                     + "."
-                    + TEXT_RESET);*/
-        }
-
+                    + TEXT_RESET);
+        }*/
         System.out.println(ANSI_BLUE + "Finalizando o listener..." + TEXT_RESET);
     }
 

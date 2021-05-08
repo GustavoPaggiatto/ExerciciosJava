@@ -21,6 +21,11 @@ import java.util.logging.Logger;
 public class SocketListener extends Thread {
 
     private boolean _error;
+    private final int _port;
+
+    public SocketListener(int port) {
+        this._port = port;
+    }
 
     public boolean getError() {
         return this._error;
@@ -32,7 +37,7 @@ public class SocketListener extends Thread {
         DataInputStream inputStream = null;
 
         try {
-            socket = new ServerSocket(5000);
+            socket = new ServerSocket(this._port);
         } catch (IOException ex) {
             Logger.getLogger(SocketListener.class.getName()).log(Level.SEVERE, null, ex);
             this._error = true;
@@ -46,9 +51,9 @@ public class SocketListener extends Thread {
                 inputStream = new DataInputStream(connected.getInputStream());
 
                 System.out.println("Tag recebida: ");
-                
+
                 String content = inputStream.readUTF();
-                
+
                 System.out.println(content);
 
                 this.sleep(5000);
