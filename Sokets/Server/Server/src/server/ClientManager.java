@@ -36,6 +36,8 @@ public class ClientManager extends Thread {
                     for (Printer p : this._listener.getPrinters()) {
                         if (!p.isPrinting()) {
                             p.setPrinting(true);
+                            printer = p;
+                            break;
                         }
                     }
                 }
