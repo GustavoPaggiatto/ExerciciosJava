@@ -5,6 +5,9 @@
  */
 package server;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Gustavo
@@ -23,28 +26,26 @@ public class Server {
         System.out.println(TEXT_PURPLE + "*************** Server Socket ***************" + TEXT_RESET);
         System.out.println(TEXT_PURPLE + "Initialising thread listener" + TEXT_RESET);
 
-        SocketListener printerOne = new SocketListener(5000);
-        printerOne.start();
+        List<Printer> printers = new ArrayList<Printer>();
+        printers.add(new Printer("192.168.0.1", "ONE"));
+        printers.add(new Printer("192.168.0.2", "TWO"));
+        printers.add(new Printer("192.168.0.3", "TREE"));
+        printers.add(new Printer("192.168.0.4", "FOUR"));
+        printers.add(new Printer("192.168.0.5", "FIVE"));
 
-        SocketListener printerTwo = new SocketListener(5001);
-        printerTwo.start();
+        SocketListener listener = new SocketListener(5000, printers);
+        listener.start();
 
-        SocketListener printerTree = new SocketListener(5002);
-        printerTree.start();
-
-        SocketListener printerFour = new SocketListener(5003);
-        printerFour.start();
-
-        SocketListener printerFive = new SocketListener(5004);
-        printerFive.start();
-
+        while (true) {
+            //nothing...
+        }
         /*while (!printerOne.getError()) {
             System.out.println(ANSI_YELLOW + "Estado do listener: "
                     + listener.getState().name()
                     + "."
                     + TEXT_RESET);
-        }*/
-        System.out.println(ANSI_BLUE + "Finalizando o listener..." + TEXT_RESET);
+        }
+        System.out.println(ANSI_BLUE + "Finalizando o listener..." + TEXT_RESET);*/
     }
 
 }

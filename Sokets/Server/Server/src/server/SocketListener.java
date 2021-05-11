@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,13 +23,27 @@ public class SocketListener extends Thread {
 
     private boolean _error;
     private final int _port;
+    private final List<Printer> _printers;
+    private int _qtdClients = 0;
+    public final Object _sync = new Object();
 
-    public SocketListener(int port) {
+    public SocketListener(int port, List<Printer> printers) {
         this._port = port;
+        this._printers = printers;
     }
 
     public boolean getError() {
         return this._error;
+    }
+
+    public List<Printer> getPrinters() {
+        return this._printers;
+    }
+
+    public void subtractClients() {
+        synchronized (this._sync) {
+            this._qtdClients--;
+        }
     }
 
     @Override
@@ -48,26 +63,24 @@ public class SocketListener extends Thread {
         while (!this._error) {
             try {
                 Socket connected = socket.accept();
-                inputStream = new DataInputStream(connected.getInputStream());
 
-                System.out.println("Tag recebida: ");
+                synchronized (this._sync) {
+                    if (this._qtdClients >= 50) {
+                        System.out.println("Nº máximo de conexões atingido...");
 
-                String content = inputStream.readUTF();
+                        connected.close();
 
-                System.out.println(content);
+                        continue;
+                    }
+                }
+
+                ClientManager cli = new ClientManager(this, connected);
+                cli.start();
 
                 this.sleep(5000);
             } catch (Exception ex) {
                 Logger.getLogger(SocketListener.class.getName()).log(Level.SEVERE, null, ex);
                 this._error = true;
-            }
-        }
-
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (Exception ex) {
-                Logger.getLogger(SocketListener.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
